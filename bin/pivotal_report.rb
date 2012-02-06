@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+require 'optparse'
+
+opts = {}
+parser = OptionParser.new do |os|
+  os.banner =<<-EOT
+Usage: pivotal_report.rb [options]
+  EOT
+
+  os.on('-t [TOKEN]', '--token [TOKEN]', 'Set API token') do |v|
+    opts[:token] = v
+  end
+
+  os.on('-p [PROJECT ID]', '--project-id [PROJECT ID]', 'Set Project ID') do |v|
+    opts[:project_id] = v
+  end
+end
+
+begin
+  parser.parse!
+  if opts[:token].nil? || opts[:project_id].nil?
+    puts parser
+    exit
+  end
+end
+
+require 'pivotal-tracker'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'pivotal_report')
+
+app = PivotalReport.new(opts)
+app.report

@@ -1,0 +1,26 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    builder (3.0.0)
+    happymapper (0.4.0)
+      libxml-ruby (~> 2.0)
+    libxml-ruby (2.2.2)
+    mime-types (1.17.2)
+    nokogiri (1.5.0)
+    pivotal-tracker (0.4.1)
+      builder
+      builder
+      happymapper (>= 0.3.2)
+      happymapper (>= 0.3.2)
+      nokogiri (>= 1.4.3)
+      nokogiri (~> 1.4)
+      rest-client (~> 1.6.0)
+      rest-client (~> 1.6.0)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  pivotal-tracker
