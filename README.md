@@ -3,9 +3,13 @@
 This is a simple ruby script I use to produce a weekly report on what us
 developers have been up to.
 
+### Installation
+
+    gem install pivotal_reporting
+
 ### Usage
 
-    bundle exec ./bin/pivotal_report.rb -t <pivotal token> -p <project id>
+    pivotal_report -t <pivotal token> -p <project id>
 
 Where `<pivotal token>` is your pivotal API token available at the end
 of [your profile page][1], and `<project id>` is the id of your project (I
