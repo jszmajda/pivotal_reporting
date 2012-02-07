@@ -19,7 +19,7 @@ id.)
 You'll get four sections: Discussion Items, Story Bullets, PPU Table,
 and In Progress. The first two are specific to my team's process (we
 pre- and post- estimate stories to improve our estimation process and
-create a feedback loop for productuion tokens). The PPU Table and In
+create a feedback loop for production tokens). The PPU Table and In
 Progress sections are probably generically useful.
 
 #### The PPU Table
