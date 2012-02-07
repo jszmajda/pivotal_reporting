@@ -24,6 +24,8 @@ begin
   end
 end
 
+require 'rubygems'
+require 'bundler/setup'
 require 'pivotal-tracker'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'pivotal_report')
 
