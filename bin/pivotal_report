@@ -4,7 +4,7 @@ require 'optparse'
 opts = {}
 parser = OptionParser.new do |os|
   os.banner =<<-EOT
-Usage: pivotal_report.rb [options]
+Usage: pivotal_report [options]
   EOT
 
   os.on('-t [TOKEN]', '--token [TOKEN]', 'Set API token') do |v|
