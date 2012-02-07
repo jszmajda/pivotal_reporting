@@ -1,3 +1,8 @@
+class PivotalTracker::Story
+  def initials
+    owned_by.split(/ /).map{|e| e[0] }.join
+  end
+end
 class PivotalReport
   def initialize(options)
     PivotalTracker::Client.token = options[:token]
@@ -12,6 +17,8 @@ class PivotalReport
     show_story_bullets
     separator
     show_ppu_table
+    separator
+    show_stories_in_progress
   end
 
   def show_accounting_breakdown
@@ -26,11 +33,11 @@ class PivotalReport
   def show_discussion_items
     puts "Discussion Items"
     puts ""
-    estimates = stories.map(&:labels).map{|e| e.to_s.split(/,/) }.flatten.map(&:strip).compact.uniq.select{|l| l =~ /^(#{POST_EST}|e\d)$/ }.sort
+    estimates = stories.sort{|a,b| a.owned_by <=> b.owned_by }.map(&:labels).map{|e| e.to_s.split(/,/) }.flatten.map(&:strip).compact.uniq.select{|l| l =~ /^(#{POST_EST}|e\d)$/ }.sort
     estimates.each do |est|
       set = stories_with_label(est)
       set.each do |story|
-        puts "(#{story.estimate}: #{est}) #{story.name.strip} (#{story.owned_by.split(/ /).map{|e| e[0] }.join})"
+        puts "(\e[31m#{story.estimate}\e[0m: \e[32m#{est}\e[0m) #{story.name.strip} (\e[33m#{story.initials}\e[0m) [\e[34m#{story.labels}\e[0m]"
       end
     end
   end
@@ -38,8 +45,13 @@ class PivotalReport
   def show_story_bullets
     puts "Story Bullets"
     puts ""
-    stories.each do |story|
-      puts "#{story.name.strip} (#{story.estimate} point#{story.estimate > 1 ? 's' : ''})"
+    lis = nil
+    stories.sort{|a,b| a.owned_by <=> b.owned_by }.each do |story|
+      if story.initials != lis
+        lis = story.initials
+        puts "#{story.initials}:"
+      end
+      puts "#{story.story_type.to_s[0]} #{story.name.strip} (#{story.estimate} point#{story.estimate > 1 ? 's' : ''})"
     end
   end
 
@@ -49,6 +61,8 @@ class PivotalReport
     categories = stories.map(&:labels).map{|e| e.to_s.split(/,/) }.flatten.map(&:strip).compact.uniq.reject{|l| l =~ /^(#{POST_EST}|e\d)$/ }.sort
     people = stories.map(&:owned_by).uniq.sort.map{|p| [p, p.split(/ /).first]}
     c_width = (['Total'] + categories).map(&:length).max
+
+    sseen = []
 
     o = []
     o << "".ljust(c_width)
@@ -65,7 +79,9 @@ class PivotalReport
         o << stories_for_user(person, stories_with_label(cat)).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(short.length)
         o << " | "
       end
-      o << stories_with_label(cat).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust('Total '.length)
+      set = stories_with_label(cat)
+      sseen += set
+      o << set.map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust('Total '.length)
       o << " || "
       %w{feature bug chore}.each do |type|
         o << stories_with_label(cat, stories_for_type(type)).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(type.length)
@@ -99,6 +115,19 @@ class PivotalReport
     end
     puts o.join
 
+    missing = stories - sseen
+    if missing.any?
+      puts "Missing:"
+      puts missing.map(&:name).join("\n")
+    end
+
+  end
+
+  def show_stories_in_progress
+    in_progress = @project.stories.all(:state => ['started', 'delivered'])
+    points_in_progress = in_progress.map(&:estimate).inject(0){|s,e| s+e}
+
+    puts "In Progress: #{points_in_progress} points"
   end
 
 
