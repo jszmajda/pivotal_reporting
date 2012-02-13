@@ -143,7 +143,7 @@ class PivotalReport
 
     def stories_with_label(label, set=nil)
       set ||= stories
-      set.select{|s| s.labels =~ /#{label}/ }
+      set.select{|s| s.labels.to_s.include? label }
     end
 
     def stories_for_user(user, set=nil)
