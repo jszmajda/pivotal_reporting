@@ -51,7 +51,13 @@ class PivotalReport
         lis = story.initials
         puts "#{story.initials}:"
       end
-      puts "#{story.story_type.to_s[0]} #{story.name.strip} (#{story.estimate} point#{story.estimate > 1 ? 's' : ''})"
+      letter = story.story_type.to_s[0]
+      color = case letter
+              when 'f' then 33
+              when 'b' then 31
+              when 'c' then 32
+              end
+      puts "\e[#{color}m#{letter}#{story.estimate} \e[0m#{story.name.strip} [\e[34m#{story.labels}\e[0m]"
     end
   end
 
