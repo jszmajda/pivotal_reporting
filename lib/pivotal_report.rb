@@ -1,6 +1,10 @@
 class PivotalTracker::Story
   def initials
-    owned_by.split(/ /).map{|e| e[0] }.join
+    if story_type.to_s == 'release'
+      'Releases'
+    else
+      owned_by.to_s.split(/ /).map{|e| e[0] }.join
+    end
   end
 end
 class PivotalReport
@@ -33,7 +37,7 @@ class PivotalReport
   def show_discussion_items
     puts "Discussion Items"
     puts ""
-    estimates = stories.sort{|a,b| a.owned_by <=> b.owned_by }.map(&:labels).map{|e| e.to_s.split(/,/) }.flatten.map(&:strip).compact.uniq.select{|l| l =~ /^(#{POST_EST}|e\d)$/ }.sort
+    estimates = stories.sort{|a,b| a.owned_by.to_s <=> b.owned_by.to_s }.map(&:labels).map{|e| e.to_s.split(/,/) }.flatten.map(&:strip).compact.uniq.select{|l| l =~ /^(#{POST_EST}|e\d)$/ }.sort
     estimates.each do |est|
       set = stories_with_label(est)
       set.each do |story|
@@ -46,7 +50,7 @@ class PivotalReport
     puts "Story Bullets"
     puts ""
     lis = nil
-    stories.sort{|a,b| a.owned_by <=> b.owned_by }.each do |story|
+    stories.sort{|a,b| a.owned_by.to_s <=> b.owned_by.to_s }.each do |story|
       if story.initials != lis
         lis = story.initials
         puts "#{story.initials}:"
@@ -65,7 +69,7 @@ class PivotalReport
     puts "PPU Table"
 
     categories = stories.map(&:labels).map{|e| e.to_s.split(/,/) }.flatten.map(&:strip).compact.uniq.reject{|l| l =~ /^(#{POST_EST}|e\d)$/ }.sort
-    people = stories.map(&:owned_by).uniq.sort.map{|p| [p, p.split(/ /).first]}
+    people = stories.map(&:owned_by).uniq.compact.sort.map{|p| [p, p.split(/ /).first]}
     c_width = (['Total'] + categories).map(&:length).max
 
     sseen = []
@@ -87,7 +91,7 @@ class PivotalReport
       end
       set = stories_with_label(cat)
       sseen += set
-      o << set.map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust('Total '.length)
+      o << set.map(&:estimate).inject(0){|s,e| s + e.to_i }.to_s.rjust('Total '.length)
       o << " || "
       %w{feature bug chore}.each do |type|
         o << stories_with_label(cat, stories_for_type(type)).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(type.length)
@@ -113,7 +117,7 @@ class PivotalReport
       o << stories_for_user(person).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(short.length)
       o << " | "
     end
-    o << stories.map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust('Total '.length)
+    o << stories.map(&:estimate).inject(0){|s,e| s + e.to_i }.to_s.rjust('Total '.length)
     o << " || "
     %w{feature bug chore}.each do |type|
       o << stories_for_type(type).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(type.length)
@@ -154,7 +158,7 @@ class PivotalReport
 
     def stories_for_user(user, set=nil)
       set ||= stories
-      set.select{|s| s.owned_by == user }
+      set.select{|s| s.owned_by.to_s == user }
     end
 
     def stories_for_type(type, set=nil)
