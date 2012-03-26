@@ -94,7 +94,7 @@ class PivotalReport
       o << set.map(&:estimate).inject(0){|s,e| s + e.to_i }.to_s.rjust('Total '.length)
       o << " || "
       %w{feature bug chore}.each do |type|
-        o << stories_with_label(cat, stories_for_type(type)).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(type.length)
+        o << stories_with_label(cat, stories_for_type(type)).map(&:estimate).inject(0){|s,e| s + e.to_i }.to_s.rjust(type.length)
         o << " | "
       end
       puts o.join
@@ -120,7 +120,7 @@ class PivotalReport
     o << stories.map(&:estimate).inject(0){|s,e| s + e.to_i }.to_s.rjust('Total '.length)
     o << " || "
     %w{feature bug chore}.each do |type|
-      o << stories_for_type(type).map(&:estimate).inject(0){|s,e| s + e }.to_s.rjust(type.length)
+      o << stories_for_type(type).map(&:estimate).inject(0){|s,e| s + e.to_i }.to_s.rjust(type.length)
       o << " | "
     end
     puts o.join
@@ -153,7 +153,7 @@ class PivotalReport
 
     def stories_with_label(label, set=nil)
       set ||= stories
-      set.select{|s| s.labels.to_s.include? label }
+      set.select{|s| s.labels.to_s =~ /(^|,)#{label}($|,)/ }
     end
 
     def stories_for_user(user, set=nil)
