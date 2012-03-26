@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "pivotal_reporting"
-  s.version = "1.1.1"
+  s.version = "1.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Joshua Szmajda"]
-  s.date = "2012-02-27"
+  s.date = "2012-03-26"
   s.description = "Please see the README. This tool generates some reports that could be useful if you're managing a team of developers using Pivotal Tracker"
   s.email = "joshsz@gmail.com"
   s.executables = ["pivotal_report"]
